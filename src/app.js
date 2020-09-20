@@ -26,70 +26,72 @@ const name = 'Mishy Jari';
 
 // Routes
 app.get('', (req, res) => {
-    res.render('index', {
-        title: 'Weather',
-        name,
-        githubUrl
-    });
+  res.render('index', {
+    title: 'Weather',
+    name,
+    githubUrl,
+  });
 });
 
-app.get('/about', (req,res) => {
-    res.render('about', {
-        title: 'About',
-        image: '/images/kitten.jpg',
-        name,
-        githubUrl
-    });
+app.get('/about', (req, res) => {
+  res.render('about', {
+    title: 'About',
+    image: '/images/kitten.jpg',
+    name,
+    githubUrl,
+  });
 });
 
-app.get('/help', (req,res) => {
-    res.render('help', {
-        title: 'Help',
-        helpBody: 'I am some helpful information',
-        name,
-        githubUrl
-    });
+app.get('/help', (req, res) => {
+  res.render('help', {
+    title: 'Help',
+    helpBody: 'I am some helpful information',
+    name,
+    githubUrl,
+  });
 });
 
 app.get('/weather', (req, res) => {
-    const address = req.query.address;
+  const address = req.query.address;
 
-    if ( !address ) {
-        return res.send({ error: 'No Address Provided.'})
+  if (!address) {
+    return res.send({error: 'No Address Provided.'});
+  }
+
+  // Address query param exists, pass into into geocode()
+  geocode(address, (geocodeErr, geocodeResponse) => {
+    if (geocodeErr) {
+      return res.send({error: geocodeErr});
     }
 
-    // Address query param exists, pass into into geocode()
-    geocode(address, (geocodeErr, geocodeResponse) => {
-        if ( geocodeErr ) { 
-            return res.send({ error: geocodeErr }) 
-        };
-
-        // geocode() did not return an error, pass the response object into forecast()
-        forecast(geocodeResponse, (forecastErr, forecastResponse) => {
-            if ( forecastErr ) { return res.send({ error: forecastErr }) };
-            res.send(forecastResponse)
-        })
-    })
-});
-
-app.get('/help/*', (req,res) => {
-    res.render('notfound', {
-        title: 'Help',
-        message: 'Help Article Not Found',
-        name,
-        githubUrl
+    // geocode() did not return an error, pass the response object into forecast()
+    forecast(geocodeResponse, (forecastErr, forecastResponse) => {
+      if (forecastErr) {
+        return res.send({error: forecastErr});
+      }
+      res.send(forecastResponse);
     });
+  });
 });
 
-app.get('*', (req,res) => {
-    res.render('notfound', {
-        title: 'Weather',
-        message: '404 Page Not Found.',
-        name,
-        githubUrl
-    })
+app.get('/help/*', (req, res) => {
+  res.render('notfound', {
+    title: 'Help',
+    message: 'Help Article Not Found',
+    name,
+    githubUrl,
+  });
+});
+
+app.get('*', (req, res) => {
+  res.render('notfound', {
+    title: 'Weather',
+    message: '404 Page Not Found.',
+    name,
+    githubUrl,
+  });
 });
 
 app.listen(port, () => {
-    console.log('Server is listening on port ' + port);
+  console.log('Server is listening on port ' + port);
 });
